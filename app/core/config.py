@@ -4,10 +4,6 @@ from functools import lru_cache
 
 import os
 
-class Settings:
-    CALENDLY_WEBHOOK_SECRET: str = os.getenv("CALENDLY_WEBHOOK_SECRET", "")
-
-settings = Settings()
 
 
 
@@ -21,7 +17,8 @@ class Settings(BaseSettings):
     EMAIL_FROM: str
     SENDGRID_API_KEY: str
 
-    # Scheduler
+    CALENDLY_WEBHOOK_SECRET: str | None = None
+
     FOLLOWUP_CHECK_INTERVAL_SECONDS: int = 300  # 5 minutes
 
     class Config:
