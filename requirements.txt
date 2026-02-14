@@ -16,3 +16,4 @@ jinja2
 uvicorn
 alembic
 pydantic
+pydantic-settings
