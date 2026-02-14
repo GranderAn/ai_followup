@@ -18,3 +18,4 @@ alembic
 pydantic
 pydantic-settings
 email-validator
+apscheduler
