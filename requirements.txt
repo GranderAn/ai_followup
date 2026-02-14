@@ -17,3 +17,4 @@ uvicorn
 alembic
 pydantic
 pydantic-settings
+email-validator
