@@ -1,6 +1,7 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
+
 from app.db.session import SessionLocal
 from app.models.lead import Lead, LeadStatus
 from app.services.followup_service import (
@@ -35,30 +36,34 @@ async def check_followups():
         )
 
         for lead in leads:
-            # Decide which follow-up to send based on status / followup_state
             if (
                 lead.followup_state
                 and not lead.followup_state.sent_24h
-                and lead.status in [LeadStatus.CONTACTED]
+                and lead.status == LeadStatus.CONTACTED
             ):
                 await send_followup_24h(db, lead)
+
             elif (
                 lead.followup_state
                 and lead.followup_state.sent_24h
                 and not lead.followup_state.sent_48h
             ):
                 await send_followup_48h(db, lead)
+
             elif (
                 lead.followup_state
                 and lead.followup_state.sent_48h
                 and not lead.followup_state.sent_72h
             ):
                 await send_followup_72h(db, lead)
+
             else:
-                # If we've sent all follow-ups and still no booking, mark as no response
                 if lead.status != LeadStatus.BOOKED:
                     lead.status = LeadStatus.NO_RESPONSE
-                    db.commit()
+
+            # Commit after each lead update
+            db.commit()
+
     finally:
         db.close()
 

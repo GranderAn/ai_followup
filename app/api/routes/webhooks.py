@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
@@ -6,7 +6,6 @@ from app.models.lead import Lead, LeadStatus
 from app.models.booking import Booking
 from app.schemas.calendly import CalendlyPayload
 from app.services.calendly_signature import verify_calendly_signature
-
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -21,14 +20,16 @@ def get_db():
 
 @router.post("/calendly")
 async def calendly_webhook(
-    payload: CalendlyPayload,
+    request: Request,
     db: Session = Depends(get_db),
 ):
+    # 1. Verify signature BEFORE parsing JSON
     await verify_calendly_signature(request)
 
+    # 2. Parse JSON AFTER signature verification
     raw = await request.json()
     payload = CalendlyPayload(**raw)
-    
+
     email = payload.invitee.email
     scheduled_for = payload.event.start_time
 
@@ -58,6 +59,3 @@ async def calendly_webhook(
 
     db.commit()
     return {"status": "ok"}
-
-
-

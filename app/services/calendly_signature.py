@@ -2,7 +2,8 @@ import hmac
 import hashlib
 import time
 from fastapi import Request, HTTPException, status
-from app.core.config import settings
+from app.core.config import get_settings
+settings = get_settings()
 
 
 MAX_SKEW_SECONDS = 300  # 5 minutes
